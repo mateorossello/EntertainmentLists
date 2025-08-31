@@ -37,6 +37,7 @@ public class EntertainmentListController {
     public ResponseEntity<Map<String, String>> createList(@RequestBody EntertainmentListInput input, @RequestParam Map<String, String> parameters) {
         try {
             EntertainmentList newList = entertainmentListService.createList(input, parameters);
+            
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(Map.of("message", "List created successfully", "id", newList.getId().toString()));
         } catch (Exception exception) {
@@ -49,6 +50,7 @@ public class EntertainmentListController {
     public ResponseEntity<Map<String, String>> updateList(@PathVariable Long id, @RequestBody EntertainmentListInput input) {
         try {
             EntertainmentList updatedList = entertainmentListService.updateList(id, input);
+
             return ResponseEntity.ok(Map.of("message", "List updated successfully", "id", updatedList.getId().toString()));
         } catch (Exception exception) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -60,6 +62,7 @@ public class EntertainmentListController {
     public ResponseEntity<Map<String, String>> deleteList(@PathVariable Long id) {
         try {
             entertainmentListService.deleteList(id);
+
             return ResponseEntity.ok(Map.of("message", "List deleted successfully"));
         } catch (Exception exception) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)

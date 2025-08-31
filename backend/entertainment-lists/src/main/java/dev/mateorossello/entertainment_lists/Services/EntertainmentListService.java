@@ -16,6 +16,7 @@ public interface EntertainmentListService {
 
     default List<EntertainmentListOutput> getAllLists() {
         List<EntertainmentList> lists = getEntertainmentListRepository().findAll();
+        
         return mapToOutputList(lists);
     }
 
@@ -34,6 +35,7 @@ public interface EntertainmentListService {
         updatedList.setId(id);
         updatedList.setName(input.getName());
         updatedList.setEntertainmentEntityIds(input.getEntertainmentEntityIds());
+
         return getEntertainmentListRepository().save(updatedList);
     }
 

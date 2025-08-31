@@ -23,23 +23,20 @@ public class EntertainmentEntityServiceKitsu implements EntertainmentEntityServi
     @Override
     public Map<String, Object> getEntityById(Long id, Map<String, String> parameters) {
         String type = parameters.get("type");
-
         if (type == null) {
-            throw new IllegalArgumentException("Type parameter is required");
+            throw new IllegalArgumentException("Type parameter is required.");
         }
 
         String url = BASE_URL + type + "/" + id;
-
         HttpHeaders headers = new HttpHeaders();
         headers.set("Accept", "application/vnd.api+json");
         HttpEntity<String> entity = new HttpEntity<>(headers);
-
+        
         ResponseEntity<Map<String, Object>> response = restTemplate.exchange(url, HttpMethod.GET, entity, new ParameterizedTypeReference<Map<String, Object>>() {});
-
         if (response.getStatusCode().is2xxSuccessful()) {
             return response.getBody();
         } else {
-            throw new RuntimeException("Failed to fetch entity: " + response.getStatusCode());
+            throw new RuntimeException("Failed to fetch entity: " + response.getStatusCode() + ".");
         }
     }
 }

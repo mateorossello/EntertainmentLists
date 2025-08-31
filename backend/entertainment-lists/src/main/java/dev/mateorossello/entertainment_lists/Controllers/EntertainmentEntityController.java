@@ -18,6 +18,7 @@ public class EntertainmentEntityController {
     public ResponseEntity<?> getEntityById(@PathVariable Long id, @RequestParam Map<String, String> parameters) {
         try {
             Map<String, Object> entity = entertainmentEntityService.getEntityById(id, parameters);
+            
             return ResponseEntity.ok(entity);
         } catch (Exception exception) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

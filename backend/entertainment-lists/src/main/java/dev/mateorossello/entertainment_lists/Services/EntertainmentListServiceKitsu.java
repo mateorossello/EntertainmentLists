@@ -31,7 +31,8 @@ public class EntertainmentListServiceKitsu implements EntertainmentListService {
     @Override
     public EntertainmentListOutputDetailed getListById(Long id) {
         EntertainmentListKitsu list = (EntertainmentListKitsu) entertainmentListRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Entertainment list not found with id: " + id));
+                .orElseThrow(() -> new IllegalArgumentException("Entertainment list not found with id: " + id + "."));
+        
         return mapToOutputListDetailed(list);
     }
 
@@ -42,6 +43,7 @@ public class EntertainmentListServiceKitsu implements EntertainmentListService {
         for (Long entityId : list.getEntertainmentEntityIds()) {
             output.addEntertainmentEntity(entertainmentEntityService.getEntityById(entityId, Map.of("type", list.getType())));
         }
+        
         return output;
     }
 
@@ -51,6 +53,7 @@ public class EntertainmentListServiceKitsu implements EntertainmentListService {
         newList.setName(input.getName());
         newList.setType(parameters.get("type"));
         newList.setEntertainmentEntityIds(input.getEntertainmentEntityIds());
+
         return entertainmentListRepository.save(newList);
     }
 }
