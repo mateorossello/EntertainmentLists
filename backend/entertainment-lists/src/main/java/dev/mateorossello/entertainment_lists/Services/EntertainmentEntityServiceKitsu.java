@@ -1,5 +1,6 @@
 package dev.mateorossello.entertainment_lists.Services;
 
+import java.util.List;
 import java.util.Map;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
@@ -14,6 +15,7 @@ import org.springframework.web.client.RestTemplate;
 public class EntertainmentEntityServiceKitsu implements EntertainmentEntityService {
     // Example of a specific service for Kitsu entities
     private static final String BASE_URL = "https://kitsu.io/api/edge/";
+    private static final int LIMIT = 10;
     private final RestTemplate restTemplate;
 
     public EntertainmentEntityServiceKitsu(RestTemplate restTemplate) {
@@ -35,6 +37,35 @@ public class EntertainmentEntityServiceKitsu implements EntertainmentEntityServi
         ResponseEntity<Map<String, Object>> response = restTemplate.exchange(url, HttpMethod.GET, entity, new ParameterizedTypeReference<Map<String, Object>>() {});
         if (response.getStatusCode().is2xxSuccessful()) {
             return response.getBody();
+        } else {
+            throw new RuntimeException("Failed to fetch entity: " + response.getStatusCode() + ".");
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<Map<String, Object>> getAllEntities(Map<String, String> parameters) {
+        String type = parameters.get("type");
+        if (type == null) {
+            throw new IllegalArgumentException("Type parameter is required.");
+        }
+
+        int page = parameters.get("page") != null ? Integer.parseInt(parameters.get("page")) : 0;
+        int offset = page * LIMIT;
+
+        String url = BASE_URL + type + "?page[limit]=" + LIMIT + "&page[offset]=" + offset;
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Accept", "application/vnd.api+json");
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+        
+        ResponseEntity<Map<String, Object>> response = restTemplate.exchange(url, HttpMethod.GET, entity, new ParameterizedTypeReference<Map<String, Object>>() {});
+        if (response.getStatusCode().is2xxSuccessful()) {
+            Map<String, Object> body = response.getBody();
+            //
+            // Warning: Unsafe Cast. Consider using a DTO instead.
+            //
+            List<Map<String, Object>> data = (List<Map<String, Object>>) body.get("data");
+            return data;
         } else {
             throw new RuntimeException("Failed to fetch entity: " + response.getStatusCode() + ".");
         }
