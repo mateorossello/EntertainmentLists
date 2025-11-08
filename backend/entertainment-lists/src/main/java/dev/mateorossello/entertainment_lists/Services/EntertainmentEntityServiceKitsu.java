@@ -1,5 +1,6 @@
 package dev.mateorossello.entertainment_lists.Services;
 
+import dev.mateorossello.entertainment_lists.DTOs.PaginatedResponse;
 import java.util.List;
 import java.util.Map;
 import org.springframework.core.ParameterizedTypeReference;
@@ -23,10 +24,15 @@ public class EntertainmentEntityServiceKitsu implements EntertainmentEntityServi
     }
     
     @Override
+    public String getType() {
+        return "kitsu";
+    }
+
+    @Override
     public Map<String, Object> getEntityById(Long id, Map<String, String> parameters) {
         String type = parameters.get("type");
         if (type == null) {
-            throw new IllegalArgumentException("Type parameter is required.");
+            throw new IllegalArgumentException("Type parameter is required");
         }
 
         String url = BASE_URL + type + "/" + id;
@@ -38,16 +44,16 @@ public class EntertainmentEntityServiceKitsu implements EntertainmentEntityServi
         if (response.getStatusCode().is2xxSuccessful()) {
             return response.getBody();
         } else {
-            throw new RuntimeException("Failed to fetch entity: " + response.getStatusCode() + ".");
+            throw new RuntimeException("Failed to fetch entity: " + response.getStatusCode());
         }
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<Map<String, Object>> getAllEntities(Map<String, String> parameters) {
+    public PaginatedResponse getAllEntities(Map<String, String> parameters) {
         String type = parameters.get("type");
         if (type == null) {
-            throw new IllegalArgumentException("Type parameter is required.");
+            throw new IllegalArgumentException("Type parameter is required");
         }
 
         int page = parameters.get("page") != null ? Integer.parseInt(parameters.get("page")) : 0;
@@ -65,9 +71,12 @@ public class EntertainmentEntityServiceKitsu implements EntertainmentEntityServi
             // Warning: Unsafe Cast. Consider using a DTO instead.
             //
             List<Map<String, Object>> data = (List<Map<String, Object>>) body.get("data");
-            return data;
+            Map<String, Object> links = (Map<String, Object>) body.get("links");
+            boolean hasNext = (links != null && links.get("next") != null);
+
+            return new PaginatedResponse(data, hasNext);
         } else {
-            throw new RuntimeException("Failed to fetch entity: " + response.getStatusCode() + ".");
+            throw new RuntimeException("Failed to fetch entity: " + response.getStatusCode());
         }
     }
 }

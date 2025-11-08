@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/entertainment-list")
 public class EntertainmentListController {
+    // Generic controller for entertainment lists
     private final EntertainmentListService entertainmentListService;
 
     public EntertainmentListController(EntertainmentListService entertainmentListService) {

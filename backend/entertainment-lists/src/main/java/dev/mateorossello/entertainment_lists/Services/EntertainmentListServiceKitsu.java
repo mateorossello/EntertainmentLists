@@ -31,7 +31,7 @@ public class EntertainmentListServiceKitsu implements EntertainmentListService {
     @Override
     public EntertainmentListOutputDetailed getListById(Long id) {
         EntertainmentListKitsu list = (EntertainmentListKitsu) entertainmentListRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Entertainment list not found with id: " + id + "."));
+                .orElseThrow(() -> new IllegalArgumentException("Entertainment list not found with id: " + id));
         
         return mapToOutputListDetailed(list);
     }

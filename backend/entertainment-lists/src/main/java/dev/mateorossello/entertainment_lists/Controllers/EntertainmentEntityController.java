@@ -1,7 +1,7 @@
 package dev.mateorossello.entertainment_lists.Controllers;
 
+import dev.mateorossello.entertainment_lists.DTOs.PaginatedResponse;
 import dev.mateorossello.entertainment_lists.Services.EntertainmentEntityService;
-import java.util.List;
 import java.util.Map;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RestController
 @RequestMapping("/api/entertainment-entity")
 public class EntertainmentEntityController {
+    // Generic controller for entertainment entities
     private final EntertainmentEntityService entertainmentEntityService;
 
     public EntertainmentEntityController(EntertainmentEntityService entertainmentEntityService) {
@@ -32,7 +33,7 @@ public class EntertainmentEntityController {
     @GetMapping
     public ResponseEntity<?> getAllEntities(@RequestParam Map<String, String> parameters) {
         try {
-            List<Map<String, Object>> entities = entertainmentEntityService.getAllEntities(parameters);
+            PaginatedResponse entities = entertainmentEntityService.getAllEntities(parameters);
             
             return ResponseEntity.ok(entities);
         } catch (Exception exception) {
