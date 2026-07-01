@@ -1,6 +1,6 @@
 # EntertainmentLists
 
-Practice project - General solution for performing CRUD operations on user lists derived from database data built with Java
+Practice project - General solution for performing CRUD operations on user lists derived from database data, built with Java
 
 ---
 
