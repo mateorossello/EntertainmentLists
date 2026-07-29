@@ -12,11 +12,15 @@ public interface EntertainmentListService {
 
     Mono<EntertainmentListOutputDetailed> getListById(Long id);
 
-    List<EntertainmentListOutput> getAllLists();
+    List<EntertainmentListOutput> getAllListsForUser(String username);
 
-    EntertainmentList createList(EntertainmentListInput input);
+    EntertainmentList createList(EntertainmentListInput input, String username);
 
-    EntertainmentList updateList(Long id, EntertainmentListInput input);
+    EntertainmentList updateList(Long id, EntertainmentListInput input, String username);
 
-    void deleteList(Long id);
+    void deleteList(Long id, String username);
+
+    void addEntityToList(Long listId, Long entityId, String username);
+
+    void removeEntityFromList(Long listId, Long entityId, String username);
 }

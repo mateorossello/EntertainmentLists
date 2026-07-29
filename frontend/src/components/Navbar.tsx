@@ -1,13 +1,19 @@
 import { useState, useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../features/auth/AuthContext";
 
 function Navbar() {
   const [kitsuOpen, setKitsuOpen] = useState(false);
   const kitsuRef = useRef<HTMLLIElement>(null);
+  const { isAuthenticated, logout } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (kitsuRef.current && !kitsuRef.current.contains(event.target as Node)) {
+      if (
+        kitsuRef.current &&
+        !kitsuRef.current.contains(event.target as Node)
+      ) {
         setKitsuOpen(false);
       }
     }
@@ -18,49 +24,101 @@ function Navbar() {
 
   return (
     <nav className="bg-gray-600 flex flex-wrap justify-between items-center p-4 gap-4">
-      <h1 className="px-4 py-2 text-2xl text-white">
-        Entertainment Lists - Implementations: Kitsu
-      </h1>
+      <Link
+        to="/"
+        className="px-4 py-2 text-2xl text-white font-bold hover:text-gray-200"
+      >
+        Entertainment Lists
+      </Link>
 
-      <ul className="flex flex-wrap items-center space-x-4">
-        <li>
-          <Link
-            to="/"
-            className="inline-flex items-center bg-blue-600 rounded px-4 py-2 text-lg text-white hover:bg-blue-800 transition-colors duration-400"
-          >
-            Home
-          </Link>
-        </li>
+      <div className="flex flex-wrap items-center gap-6">
+        <ul className="flex items-center space-x-4">
+          <li>
+            <Link
+              to="/"
+              className="cursor-pointer inline-flex items-center rounded px-4 py-2 text-lg text-white transition-colors duration-400 border-2 border-white hover:bg-white hover:text-gray-600 font-medium"
+            >
+              Home
+            </Link>
+          </li>
 
-        <li className="relative" ref={kitsuRef}>
-          <button
-            onClick={() => setKitsuOpen(!kitsuOpen)}
-            className={`inline-flex items-center rounded px-4 py-2 text-lg text-white transition-colors duration-400 cursor-pointer ${kitsuOpen ? "bg-blue-800" : "bg-blue-600 hover:bg-blue-800"}`}
-          >
-            Kitsu
-          </button>
+          <li className="relative" ref={kitsuRef}>
+            <button
+              onClick={() => setKitsuOpen(!kitsuOpen)}
+              className="cursor-pointer inline-flex items-center rounded px-4 py-2 text-lg text-white transition-colors duration-400 border-2 border-white hover:bg-white hover:text-gray-600 font-medium"
+            >
+              Kitsu
+            </button>
 
-          {kitsuOpen && (
-            <div className="absolute top-full right-0 mt-2 bg-gray-700 rounded shadow-lg flex flex-col min-w-[120px] z-10">
-              <Link
-                to="/anime"
-                onClick={() => setKitsuOpen(false)}
-                className="px-4 py-2 text-white hover:bg-gray-500 rounded-t transition-colors duration-200"
-              >
-                Anime
-              </Link>
+            {kitsuOpen && (
+              <div className="absolute top-full right-0 mt-2 bg-gray-700 rounded shadow-lg flex flex-col min-w-[120px] z-10">
+                <Link
+                  to="/anime"
+                  onClick={() => setKitsuOpen(false)}
+                  className="px-4 py-2 text-white hover:bg-gray-500 rounded-t transition-colors duration-200"
+                >
+                  Anime
+                </Link>
 
-              <Link
-                to="/manga"
-                onClick={() => setKitsuOpen(false)}
-                className="px-4 py-2 text-white hover:bg-gray-500 rounded-b transition-colors duration-200"
-              >
-                Manga
-              </Link>
-            </div>
+                <Link
+                  to="/manga"
+                  onClick={() => setKitsuOpen(false)}
+                  className="px-4 py-2 text-white hover:bg-gray-500 rounded-b transition-colors duration-200"
+                >
+                  Manga
+                </Link>
+              </div>
+            )}
+          </li>
+        </ul>
+
+        <div className="hidden sm:block w-px h-8 bg-gray-400"></div>
+
+        <ul className="flex items-center space-x-4">
+          {isAuthenticated ? (
+            <>
+              <li>
+                <Link
+                  to="/dashboard"
+                  className="cursor-pointer inline-flex items-center rounded px-4 py-2 text-lg text-white transition-colors duration-400 border-2 border-white hover:bg-white hover:text-gray-600 font-medium"
+                >
+                  My Lists
+                </Link>
+              </li>
+              <li>
+                <button
+                  onClick={() => {
+                    logout();
+                    navigate("/");
+                  }}
+                  className="cursor-pointer inline-flex items-center rounded px-4 py-2 text-lg text-white transition-colors duration-400 border-2 border-white hover:bg-white hover:text-gray-600 font-medium"
+                >
+                  Logout
+                </button>
+              </li>
+            </>
+          ) : (
+            <>
+              <li>
+                <Link
+                  to="/login"
+                  className="cursor-pointer inline-flex items-center rounded px-4 py-2 text-lg text-white transition-colors duration-400 border-2 border-white hover:bg-white hover:text-gray-600 font-medium"
+                >
+                  Login
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/register"
+                  className="cursor-pointer inline-flex items-center rounded px-4 py-2 text-lg text-white transition-colors duration-400 border-2 border-white hover:bg-white hover:text-gray-600 font-medium"
+                >
+                  Register
+                </Link>
+              </li>
+            </>
           )}
-        </li>
-      </ul>
+        </ul>
+      </div>
     </nav>
   );
 }

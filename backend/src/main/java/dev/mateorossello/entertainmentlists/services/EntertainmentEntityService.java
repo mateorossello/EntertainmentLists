@@ -10,6 +10,8 @@ public interface EntertainmentEntityService {
     // If your implementation does not use pagination, it will only return one page
     
     Mono<Map<String, Object>> getEntityById(Long id, Map<String, String> parameters);
+
     Mono<PaginatedResponse> getAllEntities(Map<String, String> parameters);
+    
     Mono<PaginatedResponse> searchEntities(Map<String, String> parameters);
 }

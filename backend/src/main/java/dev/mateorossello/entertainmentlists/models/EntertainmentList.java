@@ -33,4 +33,8 @@ public class EntertainmentList {
     @CollectionTable(name = "entertainment_list_entities", joinColumns = @JoinColumn(name = "entertainment_list_id"))
     @Column(name = "entertainment_entity_id")
     private List<Long> entertainmentEntityIds;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 }

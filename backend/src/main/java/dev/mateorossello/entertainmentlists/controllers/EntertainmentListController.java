@@ -3,11 +3,12 @@ package dev.mateorossello.entertainmentlists.controllers;
 import dev.mateorossello.entertainmentlists.dtos.EntertainmentListInput;
 import dev.mateorossello.entertainmentlists.dtos.EntertainmentListOutput;
 import dev.mateorossello.entertainmentlists.dtos.EntertainmentListOutputDetailed;
+import dev.mateorossello.entertainmentlists.dtos.SuccessResponse;
 import dev.mateorossello.entertainmentlists.models.EntertainmentList;
 import dev.mateorossello.entertainmentlists.services.EntertainmentListService;
 import jakarta.validation.Valid;
+import java.security.Principal;
 import java.util.List;
-import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
@@ -29,29 +30,43 @@ public class EntertainmentListController {
     }
 
     @GetMapping
-    public List<EntertainmentListOutput> getAllLists() {
-        return entertainmentListService.getAllLists();
+    public List<EntertainmentListOutput> getAllLists(Principal principal) {
+        return entertainmentListService.getAllListsForUser(principal.getName());
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Map<String, String> createList(@Valid @RequestBody EntertainmentListInput input) {
-        EntertainmentList newList = entertainmentListService.createList(input);
+    public SuccessResponse createList(@Valid @RequestBody EntertainmentListInput input, Principal principal) {
+        EntertainmentList newList = entertainmentListService.createList(input, principal.getName());
         
-        return Map.of("message", "List created successfully", "id", newList.getId().toString());
+        return new SuccessResponse("List created successfully", newList.getId().toString());
     }
 
     @PutMapping("/{id}")
-    public Map<String, String> updateList(@PathVariable Long id, @Valid @RequestBody EntertainmentListInput input) {
-        EntertainmentList updatedList = entertainmentListService.updateList(id, input);
+    public SuccessResponse updateList(@PathVariable Long id, @Valid @RequestBody EntertainmentListInput input, Principal principal) {
+        entertainmentListService.updateList(id, input, principal.getName());
 
-        return Map.of("message", "List updated successfully", "id", updatedList.getId().toString());
+        return new SuccessResponse("List updated successfully");
     }
 
     @DeleteMapping("/{id}")
-    public Map<String, String> deleteList(@PathVariable Long id) {
-        entertainmentListService.deleteList(id);
+    public SuccessResponse deleteList(@PathVariable Long id, Principal principal) {
+        entertainmentListService.deleteList(id, principal.getName());
 
-        return Map.of("message", "List deleted successfully");
+        return new SuccessResponse("List deleted successfully");
+    }
+
+    @PostMapping("/{id}/entities/{entityId}")
+    public SuccessResponse addEntityToList(@PathVariable Long id, @PathVariable Long entityId, Principal principal) {
+        entertainmentListService.addEntityToList(id, entityId, principal.getName());
+        
+        return new SuccessResponse("Entity added successfully to the list");
+    }
+
+    @DeleteMapping("/{id}/entities/{entityId}")
+    public SuccessResponse removeEntityFromList(@PathVariable Long id, @PathVariable Long entityId, Principal principal) {
+        entertainmentListService.removeEntityFromList(id, entityId, principal.getName());
+        
+        return new SuccessResponse("Entity removed successfully from the list");
     }
 }

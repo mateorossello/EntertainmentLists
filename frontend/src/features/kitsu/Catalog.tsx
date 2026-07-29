@@ -1,66 +1,27 @@
 import { useState, useEffect } from "react";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
+import { useAuth } from "../auth/AuthContext";
+import { fetchEntities } from "./api";
+import { AddToListModal } from "../lists/AddToListModal";
 
-interface EntitiesProps {
-  type: string;
-}
-
-interface KitsuEntity {
-  id: string;
-  attributes: {
-    synopsis: string;
-    canonicalTitle: string;
-    posterImage: {
-      original: string;
-    };
-  };
-}
-
-interface BackendKitsuResponse {
-  data: KitsuEntity[];
-  hasNextPage: boolean;
-}
-
-const fetchEntities = async (
-  type: string,
-  page: number,
-  searchQuery: string,
-): Promise<BackendKitsuResponse> => {
-  const params = new URLSearchParams({
-    type,
-    page: String(page),
-    sort: "-userCount",
-  });
-
-  if (searchQuery) {
-    params.append("query", searchQuery);
-  }
-
-  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
-  const endpoint = searchQuery
-    ? "/api/entertainment-entity/search"
-    : "/api/entertainment-entity";
-
-  const response = await fetch(`${apiUrl}${endpoint}?${params.toString()}`);
-
-  if (!response.ok) {
-    throw new Error("Failed to obtain entities");
-  }
-
-  const backendKitsuResponse: BackendKitsuResponse = await response.json();
-  return backendKitsuResponse;
-};
-
-function Entities({ type }: EntitiesProps) {
+function KitsuCatalog({ type }: { type: string }) {
   const [page, setPage] = useState(0);
   const [searchInput, setSearchInput] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const { isAuthenticated } = useAuth();
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [selectedEntityId, setSelectedEntityId] = useState<string | null>(null);
 
   useEffect(() => {
     setPage(0);
     setSearchInput("");
     setSearchQuery("");
   }, [type]);
+
+  const openAddModal = (entityId: string) => {
+    setSelectedEntityId(entityId);
+    setShowAddModal(true);
+  };
 
   const {
     data: backendKitsuResponse,
@@ -93,7 +54,9 @@ function Entities({ type }: EntitiesProps) {
   if (isError) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh]">
-        <p className="text-xl text-red-600 font-bold mb-2">An error occurred</p>
+        <p className="text-2xl text-red-600 font-bold mb-2">
+          An error occurred
+        </p>
 
         <p className="text-gray-600">{error.message}</p>
       </div>
@@ -150,12 +113,27 @@ function Entities({ type }: EntitiesProps) {
               alt={`${item.attributes.canonicalTitle} poster`}
             />
 
-            <div className="flex-1 ml-4">
-              <h3 className="text-lg font-bold mb-2">
-                {item.attributes.canonicalTitle}
-              </h3>
+            <div className="flex-1 ml-4 flex flex-col justify-between h-full">
+              <div>
+                <h3 className="text-lg font-bold mb-2">
+                  {item.attributes.canonicalTitle}
+                </h3>
 
-              <p className="text-gray-600">{item.attributes.synopsis}</p>
+                <p className="text-gray-600 line-clamp-5">
+                  {item.attributes.synopsis}
+                </p>
+              </div>
+
+              {isAuthenticated && (
+                <div className="mt-4 flex justify-end">
+                  <button
+                    onClick={() => openAddModal(item.id)}
+                    className="cursor-pointer bg-green-600 text-white px-4 py-2 rounded hover:bg-green-800 transition-colors text-sm font-bold"
+                  >
+                    Add to List
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         ))}
@@ -206,8 +184,19 @@ function Entities({ type }: EntitiesProps) {
           </svg>
         </button>
       </div>
+
+      {/* Add to List Modal */}
+      {selectedEntityId && (
+        <AddToListModal
+          isOpen={showAddModal}
+          onClose={() => setShowAddModal(false)}
+          entityId={selectedEntityId}
+          type={type}
+          provider="KITSU"
+        />
+      )}
     </div>
   );
 }
 
-export default Entities;
+export default KitsuCatalog;
