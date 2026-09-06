@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import type { EntertainmentList } from "./api";
 import { fetchUserLists, addEntityToList } from "./api";
 
@@ -21,16 +21,7 @@ export function AddToListModal({
   const [loadingLists, setLoadingLists] = useState(false);
   const [actionMessage, setActionMessage] = useState("");
 
-  useEffect(() => {
-    if (isOpen) {
-      loadLists();
-    } else {
-      setActionMessage("");
-      setUserLists([]);
-    }
-  }, [isOpen, type, provider]);
-
-  const loadLists = async () => {
+  const loadLists = useCallback(async () => {
     setActionMessage("");
     setLoadingLists(true);
 
@@ -42,12 +33,21 @@ export function AddToListModal({
           (list) => list.type === type && list.provider === provider,
         ),
       );
-    } catch (error: unknown) {
+    } catch {
       setActionMessage("Failed to load lists");
     } finally {
       setLoadingLists(false);
     }
-  };
+  }, [type, provider]);
+
+  useEffect(() => {
+    if (isOpen) {
+      loadLists();
+    } else {
+      setActionMessage("");
+      setUserLists([]);
+    }
+  }, [isOpen, loadLists]);
 
   const handleAddToList = async (listId: number) => {
     if (!entityId) return;
@@ -56,7 +56,7 @@ export function AddToListModal({
       await addEntityToList(listId, entityId);
       setActionMessage("Added successfully!");
       setTimeout(() => onClose(), 1500);
-    } catch (error: unknown) {
+    } catch {
       setActionMessage("Failed to add to list");
     }
   };

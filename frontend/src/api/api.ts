@@ -64,11 +64,11 @@ export const fetchWithAuth = async (
         try {
           const parsed = JSON.parse(errorData);
           errorMessage = parsed.error || parsed.message || errorData;
-        } catch (exception) {
+        } catch {
           errorMessage = errorData;
         }
       }
-    } catch (exception) {
+    } catch {
       errorMessage = response.statusText;
     }
 

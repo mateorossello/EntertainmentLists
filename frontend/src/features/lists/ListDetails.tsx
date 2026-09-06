@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { useAuth } from "../auth/AuthContext";
+import { useAuth } from "../auth/useAuth";
 import { fetchListDetails, removeEntityFromList } from "./api";
 import { KitsuListRenderer } from "../kitsu/ListRenderer";
 import { TmdbListRenderer } from "../tmdb/ListRenderer";
 import { ConfirmationModal } from "../../components/ConfirmationModal";
 
+// TODO: replace any with a shared interface and keep the registry dynamic as new providers are added.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const LIST_RENDERERS: Record<string, React.FC<any>> = {
   KITSU: KitsuListRenderer,
   TMDB: TmdbListRenderer,
@@ -44,7 +46,7 @@ function ListDetails() {
       setActionMessage("Removed successfully!");
       refetch();
       setTimeout(() => setActionMessage(""), 3000);
-    } catch (error: unknown) {
+    } catch {
       setActionMessage("Failed to remove item");
       setTimeout(() => setActionMessage(""), 3000);
     } finally {

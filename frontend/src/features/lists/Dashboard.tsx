@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { useAuth } from "../auth/AuthContext";
+import { useAuth } from "../auth/useAuth";
 import { PROVIDERS_CONFIGURATION } from "../../configuration/providers";
 import type { EntertainmentList } from "./api";
 import { fetchUserLists, createList, deleteList } from "./api";

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
-import { useAuth } from "../../features/auth/AuthContext";
+import { useAuth } from "../../features/auth/useAuth";
 import { fetchEntities } from "./api";
 import { AddToListModal } from "../../features/lists/AddToListModal";
 
