@@ -1,20 +1,21 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../features/auth/AuthContext";
+import { PROVIDERS_CONFIGURATION } from "../configuration/providers";
 
 function Navbar() {
-  const [kitsuOpen, setKitsuOpen] = useState(false);
-  const kitsuRef = useRef<HTMLLIElement>(null);
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const dropdownReference = useRef<HTMLUListElement>(null);
   const { isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
-        kitsuRef.current &&
-        !kitsuRef.current.contains(event.target as Node)
+        dropdownReference.current &&
+        !dropdownReference.current.contains(event.target as Node)
       ) {
-        setKitsuOpen(false);
+        setActiveDropdown(null);
       }
     }
 
@@ -42,34 +43,33 @@ function Navbar() {
             </Link>
           </li>
 
-          <li className="relative" ref={kitsuRef}>
-            <button
-              onClick={() => setKitsuOpen(!kitsuOpen)}
-              className="cursor-pointer inline-flex items-center rounded px-4 py-2 text-lg text-white transition-colors duration-400 border-2 border-white hover:bg-white hover:text-gray-600 font-medium"
-            >
-              Kitsu
-            </button>
+          {Object.entries(PROVIDERS_CONFIGURATION).map(([key, configuration]) => (
+            <li className="relative" key={key}>
+              <button
+                onClick={() =>
+                  setActiveDropdown(activeDropdown === key ? null : key)
+                }
+                className="cursor-pointer inline-flex items-center rounded px-4 py-2 text-lg text-white transition-colors duration-400 border-2 border-white hover:bg-white hover:text-gray-600 font-medium"
+              >
+                {configuration.label}
+              </button>
 
-            {kitsuOpen && (
-              <div className="absolute top-full right-0 mt-2 bg-gray-700 rounded shadow-lg flex flex-col min-w-[120px] z-10">
-                <Link
-                  to="/anime"
-                  onClick={() => setKitsuOpen(false)}
-                  className="px-4 py-2 text-white hover:bg-gray-500 rounded-t transition-colors duration-200"
-                >
-                  Anime
-                </Link>
-
-                <Link
-                  to="/manga"
-                  onClick={() => setKitsuOpen(false)}
-                  className="px-4 py-2 text-white hover:bg-gray-500 rounded-b transition-colors duration-200"
-                >
-                  Manga
-                </Link>
-              </div>
-            )}
-          </li>
+              {activeDropdown === key && (
+                <div className="absolute top-full right-0 mt-2 bg-gray-700 rounded shadow-lg flex flex-col min-w-[120px] z-10">
+                  {configuration.types.map((type, index) => (
+                    <Link
+                      key={type.value}
+                      to={`/${type.value}`}
+                      onClick={() => setActiveDropdown(null)}
+                      className={`px-4 py-2 text-white hover:bg-gray-500 transition-colors duration-200 ${index === 0 ? "rounded-t" : ""} ${index === configuration.types.length - 1 ? "rounded-b" : ""}`}
+                    >
+                      {type.label}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </li>
+          ))}
         </ul>
 
         <div className="hidden sm:block w-px h-8 bg-gray-400"></div>

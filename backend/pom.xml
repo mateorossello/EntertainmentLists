@@ -6,17 +6,17 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>4.1.0</version>
+		<version>4.1.1</version>
 	</parent>
 
 	<groupId>dev.mateorossello</groupId>
 	<artifactId>entertainment-lists</artifactId>
 	<version>0.1.0</version>
 	<name>entertainment-lists</name>
-	<description>General solution for performing CRUD operations on user lists derived from database data</description>
+	<description>General Solution for Performing CRUD Operations on User Lists Derived from Database Data</description>
 
 	<properties>
-		<java.version>17</java.version>
+		<java.version>21</java.version>
 	</properties>
 
 	<dependencies>

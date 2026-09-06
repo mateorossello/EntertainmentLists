@@ -11,6 +11,7 @@ import { AuthProvider, useAuth } from "./features/auth/AuthContext";
 import Navbar from "./components/Navbar";
 import Home from "./Home";
 import KitsuCatalog from "./features/kitsu/Catalog";
+import TmdbCatalog from "./features/tmdb/Catalog";
 import Login from "./features/auth/Login";
 import Register from "./features/auth/Register";
 import Dashboard from "./features/lists/Dashboard";
@@ -82,6 +83,8 @@ function App() {
 
               <Route path="/anime" element={<KitsuCatalog type="anime" />} />
               <Route path="/manga" element={<KitsuCatalog type="manga" />} />
+              <Route path="/movie" element={<TmdbCatalog type="movie" />} />
+              <Route path="/tv" element={<TmdbCatalog type="tv" />} />
             </Routes>
           </div>
         </Router>

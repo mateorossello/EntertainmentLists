@@ -6,6 +6,7 @@ import dev.mateorossello.entertainmentlists.dtos.AuthResponse;
 import dev.mateorossello.entertainmentlists.dtos.SuccessResponse;
 import dev.mateorossello.entertainmentlists.services.UserService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -25,6 +26,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
+    @ResponseStatus(HttpStatus.CREATED)
     public SuccessResponse register(@Valid @RequestBody AuthRequest request) {
         userService.registerUser(request.username(), request.password());
         return new SuccessResponse("User registered successfully");

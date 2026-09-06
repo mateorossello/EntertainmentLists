@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
-import { useAuth } from "../auth/AuthContext";
+import { useAuth } from "../../features/auth/AuthContext";
 import { fetchEntities } from "./api";
-import { AddToListModal } from "../lists/AddToListModal";
+import { AddToListModal } from "../../features/lists/AddToListModal";
 
-function KitsuCatalog({ type }: { type: string }) {
+function TmdbCatalog({ type }: { type: string }) {
   const [page, setPage] = useState(0);
   const [searchInput, setSearchInput] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
@@ -24,13 +24,13 @@ function KitsuCatalog({ type }: { type: string }) {
   };
 
   const {
-    data: backendKitsuResponse,
+    data: backendTmdbResponse,
     isLoading,
     isPlaceholderData,
     isError,
     error,
   } = useQuery({
-    queryKey: ["entities-kitsu", type, page, searchQuery],
+    queryKey: ["entities-tmdb", type, page, searchQuery],
     queryFn: () => fetchEntities(type, page, searchQuery),
     placeholderData: keepPreviousData,
   });
@@ -45,7 +45,6 @@ function KitsuCatalog({ type }: { type: string }) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh]">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
-
         <p className="text-xl text-gray-600 font-semibold">Loading {type}</p>
       </div>
     );
@@ -57,19 +56,17 @@ function KitsuCatalog({ type }: { type: string }) {
         <p className="text-2xl text-red-600 font-bold mb-2">
           An error occurred
         </p>
-
         <p className="text-gray-600">{error.message}</p>
       </div>
     );
   }
 
-  if (!backendKitsuResponse?.data || backendKitsuResponse.data.length === 0) {
+  if (!backendTmdbResponse?.data || backendTmdbResponse.data.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh]">
         <p className="text-2xl text-gray-600 font-bold mb-2">
           No results found
         </p>
-
         <p className="text-gray-500">Try a different search</p>
       </div>
     );
@@ -99,44 +96,44 @@ function KitsuCatalog({ type }: { type: string }) {
       <div
         className={`grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 transition-opacity duration-100 ${isPlaceholderData ? "opacity-50 pointer-events-none" : "opacity-100"}`}
       >
-        {backendKitsuResponse.data.map((item) => (
-          <div
-            key={item.id}
-            className="bg-white rounded shadow-2xl p-4 flex items-center"
-          >
-            <img
-              src={
-                item.attributes.posterImage?.original ||
-                "https://placehold.co/400x600?text=No+Image"
-              }
-              className="w-1/4 h-60 rounded object-cover"
-              alt={`${item.attributes.canonicalTitle} poster`}
-            />
+        {backendTmdbResponse.data.map((item) => {
+          const title = item.title || item.name;
+          const posterUrl = item.poster_path
+            ? `https://image.tmdb.org/t/p/w500${item.poster_path}`
+            : "https://placehold.co/400x600?text=No+Image";
 
-            <div className="flex-1 ml-4 flex flex-col justify-between h-full">
-              <div>
-                <h3 className="text-lg font-bold mb-2">
-                  {item.attributes.canonicalTitle}
-                </h3>
+          return (
+            <div
+              key={item.id}
+              className="bg-white rounded shadow-2xl p-4 flex items-center"
+            >
+              <img
+                src={posterUrl}
+                className="w-1/4 h-60 rounded object-cover"
+                alt={`${title} poster`}
+              />
 
-                <p className="text-gray-600 line-clamp-5">
-                  {item.attributes.synopsis}
-                </p>
-              </div>
+              <div className="flex-1 ml-4 flex flex-col justify-between h-full">
+                <div>
+                  <h3 className="text-lg font-bold mb-2">{title}</h3>
 
-              {isAuthenticated && (
-                <div className="mt-4 flex justify-end">
-                  <button
-                    onClick={() => openAddModal(item.id)}
-                    className="cursor-pointer bg-green-600 text-white px-4 py-2 rounded hover:bg-green-800 transition-colors text-sm font-bold"
-                  >
-                    Add to List
-                  </button>
+                  <p className="text-gray-600 line-clamp-5">{item.overview}</p>
                 </div>
-              )}
+
+                {isAuthenticated && (
+                  <div className="mt-4 flex justify-end">
+                    <button
+                      onClick={() => openAddModal(String(item.id))}
+                      className="cursor-pointer bg-green-600 text-white px-4 py-2 rounded hover:bg-green-800 transition-colors text-sm font-bold"
+                    >
+                      Add to List
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       <div className="flex justify-center items-center gap-4 p-4">
@@ -165,7 +162,7 @@ function KitsuCatalog({ type }: { type: string }) {
 
         <button
           onClick={() => setPage((page) => page + 1)}
-          disabled={!backendKitsuResponse.hasNextPage}
+          disabled={!backendTmdbResponse.hasNextPage}
           className="w-12 h-12 flex items-center justify-center bg-blue-600 rounded-full text-white hover:bg-blue-800 disabled:bg-gray-400 disabled:cursor-not-allowed cursor-pointer transition-all duration-300 shadow hover:shadow-md"
           aria-label="Next Page"
         >
@@ -192,11 +189,11 @@ function KitsuCatalog({ type }: { type: string }) {
           onClose={() => setShowAddModal(false)}
           entityId={selectedEntityId}
           type={type}
-          provider="KITSU"
+          provider="TMDB"
         />
       )}
     </div>
   );
 }
 
-export default KitsuCatalog;
+export default TmdbCatalog;

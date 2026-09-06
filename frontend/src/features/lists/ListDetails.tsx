@@ -3,9 +3,14 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "../auth/AuthContext";
 import { fetchListDetails, removeEntityFromList } from "./api";
-import type { KitsuEntityMetadata } from "../kitsu/types";
 import { KitsuListRenderer } from "../kitsu/ListRenderer";
+import { TmdbListRenderer } from "../tmdb/ListRenderer";
 import { ConfirmationModal } from "../../components/ConfirmationModal";
+
+const LIST_RENDERERS: Record<string, React.FC<any>> = {
+  KITSU: KitsuListRenderer,
+  TMDB: TmdbListRenderer,
+};
 
 function ListDetails() {
   const { id } = useParams<{ id: string }>();
@@ -120,12 +125,17 @@ function ListDetails() {
           </div>
         ) : (
           <div className="mt-8">
-            {listData.provider === "KITSU" && (
-              <KitsuListRenderer
-                items={listData.metadata as KitsuEntityMetadata[]}
-                onRemove={confirmRemove}
-              />
-            )}
+            {(() => {
+              const Renderer = LIST_RENDERERS[listData.provider];
+
+              return Renderer ? (
+                <Renderer items={listData.metadata} onRemove={confirmRemove} />
+              ) : (
+                <div className="text-center text-red-600 font-bold p-4">
+                  Unknown provider: {listData.provider}
+                </div>
+              );
+            })()}
           </div>
         )}
       </div>

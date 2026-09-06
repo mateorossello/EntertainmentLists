@@ -1,16 +1,16 @@
-import type { BackendKitsuResponse } from "./types";
+import type { BackendTmdbResponse } from "./types";
 import { API_BASE_URL } from "../../api/api";
 
 export const fetchEntities = async (
   type: string,
   page: number,
   searchQuery: string,
-): Promise<BackendKitsuResponse> => {
+): Promise<BackendTmdbResponse> => {
   const params = new URLSearchParams({
     type,
     page: String(page),
-    sort: "-userCount",
-    provider: "KITSU",
+    sort: "popularity.desc",
+    provider: "TMDB",
   });
 
   if (searchQuery) {
@@ -29,7 +29,7 @@ export const fetchEntities = async (
     throw new Error("Failed to obtain entities");
   }
 
-  const backendKitsuResponse: BackendKitsuResponse = await response.json();
+  const backendTmdbResponse: BackendTmdbResponse = await response.json();
 
-  return backendKitsuResponse;
+  return backendTmdbResponse;
 };

@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
+import { PROVIDERS_CONFIGURATION } from "../../configuration/providers";
 import type { EntertainmentList } from "./api";
 import { fetchUserLists, createList, deleteList } from "./api";
 import { TrashIcon } from "../../components/TrashIcon";
@@ -169,12 +170,12 @@ function Dashboard() {
 
                   <div className="flex space-x-2 mb-4">
                     <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded capitalize">
-                      {list.provider.toLowerCase()}
+                      {list.provider.toUpperCase()}
                     </span>
 
                     {list.type && (
                       <span className="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded capitalize">
-                        {list.type}
+                        {list.type.toUpperCase()}
                       </span>
                     )}
                   </div>
@@ -225,29 +226,42 @@ function Dashboard() {
 
                 <select
                   value={newListProvider}
-                  onChange={(event) => setNewListProvider(event.target.value)}
+                  onChange={(event) => {
+                    const provider = event.target.value;
+                    setNewListProvider(provider);
+                    setNewListType(
+                      PROVIDERS_CONFIGURATION[provider].defaultType,
+                    );
+                  }}
                   className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
                 >
-                  <option value="KITSU">Kitsu</option>
+                  {Object.entries(PROVIDERS_CONFIGURATION).map(
+                    ([key, configuration]) => (
+                      <option key={key} value={key}>
+                        {configuration.label}
+                      </option>
+                    ),
+                  )}
                 </select>
               </div>
 
-              {newListProvider === "KITSU" && (
-                <div className="mb-6">
-                  <label className="block text-black font-bold mb-2">
-                    Type
-                  </label>
+              <div className="mb-6">
+                <label className="block text-black font-bold mb-2">Type</label>
 
-                  <select
-                    value={newListType}
-                    onChange={(event) => setNewListType(event.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
-                  >
-                    <option value="anime">Anime</option>
-                    <option value="manga">Manga</option>
-                  </select>
-                </div>
-              )}
+                <select
+                  value={newListType}
+                  onChange={(event) => setNewListType(event.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
+                >
+                  {PROVIDERS_CONFIGURATION[newListProvider].types.map(
+                    (typeOption) => (
+                      <option key={typeOption.value} value={typeOption.value}>
+                        {typeOption.label}
+                      </option>
+                    ),
+                  )}
+                </select>
+              </div>
 
               <div className="flex justify-center gap-3">
                 <button
